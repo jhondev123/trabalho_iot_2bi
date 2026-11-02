@@ -1,0 +1,10 @@
+# Node / Next.js
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+
+# Segredos (use os arquivos .example)
+.env
+.env*.local
+firmware/secrets.h
