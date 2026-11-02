@@ -1,0 +1,58 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #f1f5f9;
+  color: #0f172a;
+}
+h1 { font-size: 1.5rem; margin: 0 0 1rem; }
+h2 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+
+.cabecalho {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.75rem 1rem; background: #0f172a; color: white;
+}
+.cabecalho .direita { font-size: 0.9rem; }
+
+.conteudo { max-width: 480px; margin: 0 auto; padding: 1.5rem 1rem; }
+.conteudo.largo { max-width: 980px; }
+.conteudo.estreito { max-width: 380px; padding-top: 4rem; }
+
+.cartao {
+  background: white; border-radius: 12px; padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  display: flex; flex-direction: column; gap: 0.75rem;
+}
+.linha { display: flex; justify-content: space-between; align-items: center; }
+
+.campo { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.9rem; margin-bottom: 0.75rem; }
+input {
+  padding: 0.6rem; font-size: 1rem; border: 1px solid #cbd5e1; border-radius: 8px;
+}
+
+button {
+  padding: 0.65rem 1rem; font-size: 1rem; border: 0; border-radius: 8px;
+  background: #2563eb; color: white; cursor: pointer;
+}
+button:disabled { background: #94a3b8; cursor: not-allowed; }
+button.link { background: none; color: #93c5fd; padding: 0 0.25rem; font-size: 0.9rem; text-decoration: underline; }
+
+.badge { padding: 0.2rem 0.7rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600; color: white; }
+.badge.verde { background: #16a34a; }
+.badge.amarelo { background: #ca8a04; }
+.badge.vermelho { background: #dc2626; }
+.badge.cinza { background: #64748b; }
+
+.mudo { color: #64748b; margin: 0; }
+.pequeno { font-size: 0.8rem; }
+.aviso { color: #b91c1c; margin: 0; }
+.info { color: #1d4ed8; margin: 0; }
+
+table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; }
+th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
+th { background: #e2e8f0; }
+
+.colunas { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 760px) { .colunas { grid-template-columns: 1fr; } }
+.lista { list-style: none; padding: 0.5rem 0.75rem; margin: 0; background: white; border-radius: 12px; max-height: 320px; overflow-y: auto; font-size: 0.85rem; }
+.lista li { padding: 0.3rem 0; border-bottom: 1px solid #f1f5f9; }
