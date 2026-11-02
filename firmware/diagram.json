@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "author": "grupo IoT",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-hc-sr04", "id": "sr04", "top": -120, "left": 180, "attrs": { "distance": "30" } },
+    { "type": "wokwi-servo", "id": "servo1", "top": -130, "left": -200, "attrs": {} },
+    { "type": "wokwi-slide-switch", "id": "sw1", "top": 220, "left": -140, "attrs": {} },
+    { "type": "wokwi-led", "id": "ledG", "top": 260, "left": 200, "attrs": { "color": "green" } },
+    { "type": "wokwi-led", "id": "ledY", "top": 260, "left": 260, "attrs": { "color": "yellow" } },
+    { "type": "wokwi-led", "id": "ledR", "top": 260, "left": 320, "attrs": { "color": "red" } },
+    { "type": "wokwi-resistor", "id": "rG", "top": 200, "left": 190, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "rY", "top": 200, "left": 250, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "rR", "top": 200, "left": 310, "rotate": 90, "attrs": { "value": "220" } }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+
+    [ "servo1:PWM", "esp:13", "green", [] ],
+    [ "servo1:V+", "esp:5V", "red", [] ],
+    [ "servo1:GND", "esp:GND.1", "black", [] ],
+
+    [ "sr04:VCC", "esp:5V", "red", [] ],
+    [ "sr04:GND", "esp:GND.2", "black", [] ],
+    [ "sr04:TRIG", "esp:32", "orange", [] ],
+    [ "sr04:ECHO", "esp:33", "blue", [] ],
+
+    [ "sw1:1", "esp:GND.1", "black", [] ],
+    [ "sw1:2", "esp:27", "purple", [] ],
+
+    [ "esp:25", "rG:1", "green", [] ],
+    [ "rG:2", "ledG:A", "green", [] ],
+    [ "ledG:C", "esp:GND.2", "black", [] ],
+
+    [ "esp:26", "rY:1", "gold", [] ],
+    [ "rY:2", "ledY:A", "gold", [] ],
+    [ "ledY:C", "esp:GND.2", "black", [] ],
+
+    [ "esp:19", "rR:1", "red", [] ],
+    [ "rR:2", "ledR:A", "red", [] ],
+    [ "ledR:C", "esp:GND.2", "black", [] ]
+  ],
+  "dependencies": {}
+}
