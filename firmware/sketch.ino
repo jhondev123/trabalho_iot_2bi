@@ -1,4 +1,5 @@
-// Armario inteligente de academia - esqueleto v0 (Wokwi)
+// Armario inteligente de academia - v1 (corrigido depois dos testes do v0)
+// Mudancas em relacao ao v0: procure por "CORRECAO" (6 pontos).
 // Placa: ESP32 | Bibliotecas: ESP32Servo, PubSubClient, ArduinoJson
 // Comecamos simples: tudo em RAM, broker publico sem senha.
 // Depois: trocar para HiveMQ Cloud (usuario/senha/TLS), guardar token na flash e usar secrets.h.
@@ -70,8 +71,12 @@ float lerDistanciaCm() {
   return us * 0.0343 / 2.0;
 }
 
-void travar()    { servo.write(ANGULO_TRAVADO);    travado = true; }
-void destravar() { servo.write(ANGULO_DESTRAVADO); travado = false; tDestravou = millis(); }
+void publicarEstado();  // declarada aqui porque destravar() usa
+
+void travar()             { servo.write(ANGULO_TRAVADO);    travado = true; }
+void destravarSilencioso() { servo.write(ANGULO_DESTRAVADO); travado = false; tDestravou = millis(); }
+// CORRECAO 3: destravar avisa o novo estado na hora (antes so aparecia no envio periodico)
+void destravar()          { destravarSilencioso(); publicarEstado(); }
 
 void atualizarLeds() {
   digitalWrite(PIN_LED_VERDE, estado == LIVRE);
@@ -142,7 +147,7 @@ void aoReceber(char* topic, byte* payload, unsigned int len) {
   if (strcmp(acao, "parear") == 0) {
     if (estado == LIVRE && strlen(tk) > 0) {
       token = tk;
-      destravar();
+      destravarSilencioso();  // mudarEstado ja publica
       mudarEstado(PAREADO);
     }
   } else if (strcmp(acao, "abrir") == 0) {
@@ -151,8 +156,8 @@ void aoReceber(char* topic, byte* payload, unsigned int len) {
     if (ehAdmin || ehDono) {
       tokensErrados = 0;
       destravar();
-    } else {
-      tokenInvalido();
+    } else if (estado == OCUPADO) {
+      tokenInvalido();  // CORRECAO 4: so conta tentativa errada quando ha um dono
     }
   }
 }
@@ -179,24 +184,28 @@ void cuidarConexao() {
 // ---------- Regras locais (R2) ----------
 void regras() {
   bool fechada = digitalRead(PIN_REED) == LOW;
+  bool abriu = portaFechada && !fechada;
+  bool fechou = !portaFechada && fechada;
+  portaFechada = fechada;  // CORRECAO 1: atualiza ANTES de publicar (antes saia a porta antiga)
 
   // porta acabou de abrir
-  if (portaFechada && !fechada) {
+  if (abriu) {
+    if (travado) publicarEvento("porta_forcada");  // CORRECAO 5: abriu com o trinco travado
     if (estado == PAREADO) portaAbriuNaJanela = true;
     publicarEstado();
   }
 
   // porta acabou de fechar: trava sempre e decide o estado pela distancia
-  if (!portaFechada && fechada) {
+  if (fechou) {
     delay(300);  // espera o servo/porta assentar
     travar();
     distancia = lerDistanciaCm();
     if (estado == PAREADO || estado == OCUPADO) {
-      mudarEstado(distancia < LIMITE_CM ? OCUPADO : LIVRE);
+      mudarEstado(distancia < LIMITE_CM ? OCUPADO : LIVRE);  // ja publica
+    } else {
+      publicarEstado();  // CORRECAO 2: uma publicacao so (antes saiam duas)
     }
-    publicarEstado();
   }
-  portaFechada = fechada;
 
   // PAREADO sem abrir a porta na janela: trava e volta para LIVRE
   if (estado == PAREADO && !portaAbriuNaJanela && millis() - tEstado > JANELA_PAREADO_MS) {
@@ -205,7 +214,8 @@ void regras() {
   }
 
   // destravou (dono/admin) e a porta nao abriu em 10 s: trava de novo
-  if (estado == OCUPADO && !travado && portaFechada && millis() - tDestravou > TEMPO_ABRIR_PORTA_MS) {
+  // CORRECAO 4: vale para qualquer estado menos PAREADO (antes o admin deixava um LIVRE destravado)
+  if (estado != PAREADO && !travado && portaFechada && millis() - tDestravou > TEMPO_ABRIR_PORTA_MS) {
     travar();
     publicarEstado();
   }
@@ -224,6 +234,7 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   mqtt.setServer(MQTT_HOST, MQTT_PORT);
+  mqtt.setKeepAlive(30);  // CORRECAO 6: mais folga se a simulacao/rede ficar lenta
   mqtt.setCallback(aoReceber);
   portaFechada = digitalRead(PIN_REED) == LOW;
   distancia = lerDistanciaCm();
