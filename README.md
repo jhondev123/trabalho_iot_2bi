@@ -62,6 +62,8 @@ Prefixo `academia/armario/<id>/` (ex.: `A07`).
 - `docs/relatorio_testes.pdf`: 11 testes do firmware v0 no Wokwi, com os bugs encontrados.
 - `docs/teste_ponta_a_ponta.pdf`: teste do site + broker + Wokwi com o firmware v1 (corrigido).
 - `docs/roteiro_testes.md`: passo a passo para repetir os testes.
+- `docs/contexto.md`: **comece por aqui** se for continuar o projeto: links, o que já foi feito, o que falta até 23/11 e decisões do grupo.
+- `docs/revisao_tecnica.md`: revisão técnica de 02/11, com problemas encontrados e a correção sugerida para cada um.
 
 ## Limitações conhecidas
 
